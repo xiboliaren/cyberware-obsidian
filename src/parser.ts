@@ -21,9 +21,12 @@ const CPT_BARE_REGEX =
 const CPT_MD_LINK_REGEX =
 	/\[`(cpt-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)`\]\([^)]*\)/g;
 
-// Matches definition sites: **ID**: `cpt-xxx`
+// Matches [[cpt-xxx]] wikilinks (already-transformed content)
+const CPT_WIKILINK_REGEX = /\[\[(cpt-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\]\]/g;
+
+// Matches definition sites: **ID**: `cpt-xxx` or **ID**: [[cpt-xxx]]
 const CPT_DEFINITION_REGEX =
-	/\*\*ID\*\*:\s*`(cpt-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)`/g;
+	/\*\*ID\*\*:\s*(?:`(cpt-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)`|\[\[(cpt-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\]\])/g;
 
 /**
  * Scan markdown content and extract all cpt-* IDs (from backtick and bare occurrences).
@@ -34,6 +37,11 @@ export function extractIds(content: string): string[] {
 
 	CPT_BACKTICK_REGEX.lastIndex = 0;
 	while ((m = CPT_BACKTICK_REGEX.exec(content)) !== null) {
+		if (m[1]) ids.add(m[1]);
+	}
+
+	CPT_WIKILINK_REGEX.lastIndex = 0;
+	while ((m = CPT_WIKILINK_REGEX.exec(content)) !== null) {
 		if (m[1]) ids.add(m[1]);
 	}
 
@@ -54,7 +62,8 @@ export function extractDefinitions(content: string): string[] {
 
 	CPT_DEFINITION_REGEX.lastIndex = 0;
 	while ((m = CPT_DEFINITION_REGEX.exec(content)) !== null) {
-		if (m[1]) ids.add(m[1]);
+		const id = m[1] || m[2];
+		if (id) ids.add(id);
 	}
 
 	return [...ids];
