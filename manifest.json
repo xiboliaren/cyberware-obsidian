@@ -1,11 +1,11 @@
 {
 	"id": "cyberware",
-	"name": "Cyberware Plugin",
-	"version": "0.0.1",
-	"minAppVersion": "0.15.0",
+	"name": "Cyberware Repos",
+	"version": "1.0.0",
+	"minAppVersion": "1.12.0",
 	"description": "Make your Cyberware-powered github repository tracing easier.",
 	"author": "Hypernetix Pte. Ltd.",
 	"authorUrl": "https://hypernetix.ai",
-	"fundingUrl": "https://hypernetix.ai/pricing",
+	"fundingUrl": "https://hypernetix.ai",
 	"isDesktopOnly": false
 }

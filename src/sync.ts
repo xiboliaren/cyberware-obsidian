@@ -1,7 +1,7 @@
 import { Notice, Vault, normalizePath, FileManager } from "obsidian";
 import { CyberwareSettings, RepoConfig, SyncState, RepoSyncState, GitHubTreeItem } from "./types";
 import { parseRepoUrl, fetchRepoTree, fetchFileContent } from "./github";
-import { buildDefinitionMap, transformContent, generateNodePages } from "./parser";
+import { extractIds, buildDefinitionMap, transformContent, generateNodePages } from "./parser";
 import { findArtifactsToml, parseArtifactPaths, filterTreeByArtifacts } from "./artifacts";
 
 export type ProgressCallback = (message: string) => void;
@@ -102,9 +102,15 @@ export class SyncEngine {
 			return;
 		}
 
-		// Phase 2: Build definition map and transform content
+		// Phase 2: Build definition map and collect all unique IDs
 		this.onProgress(`Building links across ${allFiles.length} files...`);
 		const definitionMap = buildDefinitionMap(allFiles);
+		const allIds = new Set<string>();
+		for (const file of allFiles) {
+			for (const id of extractIds(file.content)) {
+				allIds.add(id);
+			}
+		}
 
 		// Phase 3: Transform content and write files
 		await this.ensureFolder(this.settings.syncFolder);
@@ -116,9 +122,10 @@ export class SyncEngine {
 			await this.writeFile(file.vaultPath, transformed);
 		}
 
-		// Phase 4: Generate ID node pages
-		const idsFolder = normalizePath(`${this.settings.syncFolder}/Artifacts`);
-		const nodePages = generateNodePages(definitionMap, idsFolder);
+		// Phase 4: Generate node pages for ALL referenced IDs
+		const artifactsFolder = normalizePath(`${this.settings.syncFolder}/Artifacts`);
+		const undefinedFolder = normalizePath(`${this.settings.syncFolder}/Undefined`);
+		const nodePages = generateNodePages(allIds, definitionMap, artifactsFolder, undefinedFolder);
 		this.onProgress(`Writing ${nodePages.length} ID node page(s)...`);
 		for (const page of nodePages) {
 			await this.writeFile(page.vaultPath, page.content);

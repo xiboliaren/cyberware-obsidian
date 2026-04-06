@@ -127,20 +127,32 @@ export interface NodePage {
 }
 
 /**
- * Generate node page files for each defined cpt-* ID.
- * Each node page links back to the document where the ID is defined,
- * creating a hub node in Obsidian's graph view.
+ * Generate node page files for every unique cpt-* ID found across all documents.
+ * - Defined IDs → "Artifacts" folder, tagged "artifact", with "Defined in [[file]]".
+ * - Undefined IDs → "Undefined" folder, tagged "undefined", with static notice text.
  */
 export function generateNodePages(
+	allIds: Set<string>,
 	definitionMap: Map<string, string>,
-	idsFolder: string
+	artifactsFolder: string,
+	undefinedFolder: string
 ): NodePage[] {
 	const pages: NodePage[] = [];
-	for (const [id, definingFile] of definitionMap) {
-		const basename = definingFile.replace(/\.md$/i, "");
-		const vaultPath = normalizePath(`${idsFolder}/${id}.md`);
-		const content = `---\ntags:\n  - artifact\n---\nDefined in [[${basename}]]\n`;
-		pages.push({ id, vaultPath, content });
+	for (const id of allIds) {
+		const definingFile = definitionMap.get(id);
+		if (definingFile) {
+			const basename = definingFile.replace(/\.md$/i, "");
+			const vaultPath = normalizePath(`${artifactsFolder}/${id}.md`);
+			const content = `---\ntags:\n  - artifact\n---\nDefined in [[${basename}]]\n`;
+			pages.push({ id, vaultPath, content });
+		} else {
+			const vaultPath = normalizePath(`${undefinedFolder}/${id}.md`);
+			const content =
+				`---\ntags:\n  - undefined\n---\n` +
+				`This artifact has been mentioned in one or more documents ` +
+				`but it's not defined anywhere in visible documents.\n`;
+			pages.push({ id, vaultPath, content });
+		}
 	}
 	return pages;
 }

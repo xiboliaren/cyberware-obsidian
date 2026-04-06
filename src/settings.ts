@@ -13,7 +13,7 @@ export class CyberwareSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		new Setting(containerEl).setName("Cyberware").setHeading();
+		new Setting(containerEl).setName("Syncronization").setHeading();
 
 		// --- GitHub token ---
 		new Setting(containerEl)
@@ -39,11 +39,10 @@ export class CyberwareSettingTab extends PluginSettingTab {
 			.setDesc("Folder in the vault where synced Markdown files are stored.")
 			.addText((text) =>
 				text
-					// eslint-disable-next-line obsidianmd/ui/sentence-case -- product name
-					.setPlaceholder("CyberPilot")
+					.setPlaceholder("Cyberware repos")
 					.setValue(this.plugin.settings.syncFolder)
 					.onChange(async (value) => {
-						this.plugin.settings.syncFolder = value.trim() || "CyberPilot";
+						this.plugin.settings.syncFolder = value.trim() || "Cyberware repos";
 						await this.plugin.saveSettings();
 					})
 			);
@@ -64,12 +63,16 @@ export class CyberwareSettingTab extends PluginSettingTab {
 		// --- Repository list ---
 		new Setting(containerEl).setName("Repositories").setHeading();
 		containerEl.createEl("p", {
-			text: "Add GitHub repository URLs to monitor. Supports https://github.com/owner/repo or https://github.com/owner/repo/tree/branch.",
+			text: "Add GitHub repository URLs to sync (up to 10). " +
+				"Supports https://github.com/owner/repo or https://github.com/owner/repo/tree/branch. " +
+				"If no branch is specified, the main branch is used.",
 			cls: "setting-item-description",
 		});
 
-		for (let i = 0; i < this.plugin.settings.repos.length; i++) {
-			const repo = this.plugin.settings.repos[i];
+		const repos = this.plugin.settings.repos;
+
+		for (let i = 0; i < repos.length; i++) {
+			const repo = repos[i];
 			if (!repo) continue;
 
 			const setting = new Setting(containerEl)
@@ -80,6 +83,7 @@ export class CyberwareSettingTab extends PluginSettingTab {
 						.onChange(async (value) => {
 							repo.url = value.trim();
 							await this.plugin.saveSettings();
+							this.display();
 						})
 				)
 				.addToggle((toggle) =>
@@ -96,7 +100,7 @@ export class CyberwareSettingTab extends PluginSettingTab {
 						.setIcon("trash")
 						.setTooltip("Remove repository")
 						.onClick(async () => {
-							this.plugin.settings.repos.splice(i, 1);
+							repos.splice(i, 1);
 							await this.plugin.saveSettings();
 							this.display();
 						})
@@ -106,15 +110,23 @@ export class CyberwareSettingTab extends PluginSettingTab {
 		}
 
 		// --- Add repo button ---
-		new Setting(containerEl).addButton((btn) =>
+		const lastRepo = repos[repos.length - 1];
+		const hasEmptyLast = repos.length > 0 && (!lastRepo || !lastRepo.url.trim());
+		const atLimit = repos.length >= 10;
+
+		new Setting(containerEl).addButton((btn) => {
 			btn
 				.setButtonText("Add repository")
 				.setCta()
+				.setDisabled(hasEmptyLast || atLimit)
 				.onClick(async () => {
-					this.plugin.settings.repos.push({ url: "", enabled: true });
+					repos.push({ url: "", enabled: true });
 					await this.plugin.saveSettings();
 					this.display();
-				})
-		);
+				});
+			if (atLimit) {
+				btn.setTooltip("Maximum of 10 repositories reached");
+			}
+		});
 	}
 }

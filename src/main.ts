@@ -26,7 +26,8 @@ export default class CyberwarePlugin extends Plugin {
 			this.setStatus(msg);
 		});
 
-		this.addRibbonIcon("refresh-cw", "Sync cyberware repos", () => {
+		// eslint-disable-next-line obsidianmd/ui/sentence-case -- brand name
+		this.addRibbonIcon("folder-sync", "Sync Cyberware repos", () => {
 			void this.runSync();
 		});
 
