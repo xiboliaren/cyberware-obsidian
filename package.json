@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "cyberware",
+	"version": "1.0.1",
+	"description": "Make your Cyberware-powered github repository tracing easier.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
