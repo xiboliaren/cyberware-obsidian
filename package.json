@@ -1,6 +1,6 @@
 {
 	"name": "cyberware",
-	"version": "1.0.1",
+	"version": "1.0.3",
 	"description": "Make your Cyberware-powered github repository tracing easier.",
 	"main": "main.js",
 	"type": "module",
