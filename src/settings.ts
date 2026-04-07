@@ -24,8 +24,7 @@ export class CyberwareSettingTab extends PluginSettingTab {
 			)
 			.addText((text) =>
 				text
-					// eslint-disable-next-line obsidianmd/ui/sentence-case -- token format
-					.setPlaceholder("ghp_...")
+					.setPlaceholder("Paste token (ghp_...)")
 					.setValue(this.plugin.settings.githubToken)
 					.onChange(async (value) => {
 						this.plugin.settings.githubToken = value.trim();

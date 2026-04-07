@@ -84,12 +84,10 @@ export class SyncEngine {
 			} catch (e) {
 				const msg = e instanceof Error ? e.message : String(e);
 				if (msg.includes("403") || msg.includes("401")) {
-					/* eslint-disable obsidianmd/ui/sentence-case -- brand names */
 					new Notice(
-						"Cyberware: GitHub denied access. Add a personal access token in Settings → Cyberware.",
+						"Cyberware: GitHub denied access. Add a personal access token in plugin settings.",
 						8000
 					);
-					/* eslint-enable obsidianmd/ui/sentence-case */
 				} else {
 					new Notice(`Cyberware: failed to sync ${repo.url} — ${msg}`);
 				}
