@@ -48,13 +48,18 @@ To quickly spot defined and undefined artifacts in Obsidian's graph view, add co
 
 Defined artifacts will appear as green nodes and undefined ones as red, making it easy to find broken or missing links.
 
-## Development
+## Releasing a new version
 
 ```bash
 npm install
-npm run dev    # watch mode
 npm run build  # production build
+git tag -a 1.0.0 -m "1.0.0"
+git push upstream 1.0.3
 ```
+
+Where `1.0.0` is a version number, and `upstream` is a main branch of upstream repository.
+
+Release object in github will be created automatically, you may need to wait it a little bit or check the status in **Action tab**. Then you should go to **Releases** via right sidebar, **Edit** just created release, add **release notes** and click **Publish release** at the very bottom of the page.
 
 ## License
 
